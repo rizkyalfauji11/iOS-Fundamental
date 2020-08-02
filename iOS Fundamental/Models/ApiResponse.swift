@@ -9,5 +9,5 @@
 import Foundation
 
 struct ApiResponse: Decodable{
-    let results: [Game]
+    var results: [Game]
 }

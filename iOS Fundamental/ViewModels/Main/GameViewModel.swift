@@ -10,9 +10,9 @@ import Foundation
 import Combine
 
 final class GameViewModel: ObservableObject,
-    UnidirectionalDataFlowType{
+UnidirectionalDataFlowType {
     typealias InputType = Input
-
+    
     private var cancellables: [AnyCancellable] = []
     
     enum Input {
@@ -89,8 +89,8 @@ final class GameViewModel: ObservableObject,
                 case .responseError: return "Network Error"
                 case .parseError: return "Parse Error"
                 }
-            }
-            .assign(to: \.errorMessage, on: self)
+        }
+        .assign(to: \.errorMessage, on: self)
         
         let errorStream = errorSubject
             .map { _ in true }
@@ -99,8 +99,8 @@ final class GameViewModel: ObservableObject,
         let showIconStream = onAppearSubject
             .map { [experimentService] _ in
                 experimentService.experiment(for: .showIcon)
-            }
-            .assign(to: \.shouldShowIcon, on: self)
+        }
+        .assign(to: \.shouldShowIcon, on: self)
         
         cancellables += [
             repositoriesStream,

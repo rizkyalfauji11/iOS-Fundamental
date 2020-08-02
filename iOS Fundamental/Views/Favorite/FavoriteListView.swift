@@ -11,7 +11,15 @@ import SwiftUI
 struct FavoriteListView: View {
     @ObservedObject var viewModel = FavoriteViewModel()
     var body: some View {
-        viewModel.getFavorites()
-        return Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        List(self.viewModel.games){ result in
+            ZStack{
+                GameRow(game: result)
+                NavigationLink(destination: DetailGameView(game: result)) {
+                    EmptyView()
+                }
+            }
+        }.onAppear(perform: {
+            self.viewModel.getFavorites()
+        })
     }
 }

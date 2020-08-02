@@ -10,11 +10,9 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 struct DetailGameView: View {
-    var game: Game
+    @State var game: Game
     @ObservedObject var viewModel: DetailGameViewModel = DetailGameViewModel()
     var body: some View {
-        viewModel.getPosts(String(self.game.id))
-        viewModel.checkFavorite(String(self.game.id))
         return ScrollView{
             VStack{
                 WebImage(url: URL(string: self.game.backgroundImage))
@@ -36,7 +34,14 @@ struct DetailGameView: View {
                 
                 
                 BodyCardView(rating: self.game.rating, description: viewModel.description, releasedDate: self.game.released )
+                    .onAppear{
+                        self.viewModel.getPosts(String(self.game.id))
+                }
                 
+            }
+            .onAppear{
+                self.viewModel.checkFavorite(String(self.game.id))
+                print(self.viewModel.genres.count)
             }
         }
         .edgesIgnoringSafeArea(.all)
@@ -46,13 +51,10 @@ struct DetailGameView: View {
         }){
             Image(systemName: self.viewModel.favoriteIcon)
             
-        })
+        }.simultaneousGesture(LongPressGesture().onEnded({ _ in
+            self.viewModel.addToFavorite(self.game)
+        }))
+        )
     }
 }
 
-
-struct DetailGameView_Previews: PreviewProvider {
-    static var previews: some View {
-        Text("Hello World!")
-    }
-}

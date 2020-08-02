@@ -16,27 +16,30 @@ let config = Realm.Configuration(schemaVersion: 1)
 class DetailGameViewModel: ObservableObject{
     @Published var description = "Plese wait .."
     @Published var favoriteIcon = "star"
+    @Published var genres: [Genre] = []
     
     func getPosts(_ id: String){
         guard let url = URL(string: "https://api.rawg.io/api/games/"+id) else {return}
-
-        URLSession.shared.dataTask(with: url){ (data, response, error) in
-            do{
-                if let error = error {
+        
+        let task = URLSession.shared.dataTask(with:url) { (data, response, error) in
+            if error != nil {
+                print(error!.localizedDescription)
+            } else {
+                do {
+                    if let data = data {
+                        let result = try JSONDecoder().decode(DetailGame.self, from: data)
+                        DispatchQueue.main.async {
+                            self.description = result.descriptionRaw
+                            self.genres = result.genres
+                        }
+                    }
+                } catch let error as NSError {
                     print(error.localizedDescription)
                 }
-                if let data = data {
-
-                    let result = try JSONDecoder().decode(DetailGame.self, from: data)
-                    DispatchQueue.main.async {
-                        self.description = result.descriptionRaw
-                    }
-                }
-
-            }catch{
-                print(error.localizedDescription)
             }
-        }.resume()
+            
+        }
+        task.resume()
     }
     
     func checkFavorite(_ id: String) {
@@ -59,7 +62,6 @@ class DetailGameViewModel: ObservableObject{
         do {
             let realm = try Realm(configuration: config)
             let object = realm.objects(datatype.self).filter("id = %@", game.id).first
-            print("Called")
             try realm.write({
                 if object == nil {
                     let newData = datatype()
@@ -70,15 +72,13 @@ class DetailGameViewModel: ObservableObject{
                     newData.rating = game.rating
                     newData.ratingTop = game.ratingTop ?? 0.0
                     realm.add(newData)
-                    print("Data Added")
                     checkFavorite(String(game.id))
                 }else{
                     guard let object = object else {return}
                     realm.delete(object)
-                    print("Data Deleted")
                     checkFavorite(String(game.id))
                 }
-            
+                
             })
         }catch {
             print(error.localizedDescription)

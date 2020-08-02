@@ -11,10 +11,11 @@ import Foundation
 struct DetailGame: Decodable, Hashable, Identifiable{
     var id: Int64
     var descriptionRaw: String
-    
+    var genres: [Genre]
     
     enum CodingKeys: String, CodingKey {
         case id
         case descriptionRaw = "description_raw"
+        case genres
     }
 }

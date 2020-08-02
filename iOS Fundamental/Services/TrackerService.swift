@@ -11,7 +11,6 @@ import Foundation
 
 enum TrackEventType {
     case listView
-    case detailView
 }
 
 protocol TrackerType {

@@ -17,8 +17,4 @@ struct RemoteRepository<type: Decodable>: APIRequestType {
             .init(name: "page_size", value: "15")
         ]
     }
-    
-    func getDetail(id: String)->String{
-        return "api/games/"+id
-    }
 }
